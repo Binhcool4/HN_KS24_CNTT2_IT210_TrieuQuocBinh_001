@@ -1,52 +1,76 @@
 package org.hackathon.controller;
 
+import jakarta.validation.Valid;
+import org.hackathon.model.Book;
+import org.hackathon.service.BookService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.hackathon.model.dto.BookDTO;
-import org.hackathon.service.BookService;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 
 @Controller
-@RequestMapping({"/","/books"})
+@RequestMapping("/books")
 public class BookController {
-    private BookService bookService;
-
-    public BookController(BookService bookService){
-        this.bookService = bookService;
+    private final BookService service;
+    private final String uploadDir = "C:/uploads/";
+    public BookController(BookService service) {
+        this.service = service;
     }
 
     @GetMapping
-    public String listEmployees(Model model){
-        model.addAttribute("listBook", bookService.getBook());
-        return "list-books";
+    public String list(@RequestParam(value = "keyword", required = false) String keyword,
+                       Model model) {
+        model.addAttribute("list", service.search(keyword));
+        return "list";
     }
 
     @GetMapping("/add")
-    public String addEmployee(Model model){
-        model.addAttribute("BookDTO",new BookDTO());
-        return "addBook";
+    public String addForm(Model model) {
+        model.addAttribute("book", new Book());
+        return "form";
     }
 
-    @GetMapping("/delete")
-    public String deleteEmployee(@RequestParam("empId")Long id, Model model){
-        boolean bl = bookService.deleteBook(id);
-        if(bl){
-            model.addAttribute("message","Xóa thành công có mã "+id);
-        }else{
-            model.addAttribute("message","Không xóa được nhân viên có mã "+id);
+    @PostMapping("/save")
+    public String save(@Valid @ModelAttribute("book") Book book,
+                       BindingResult result,
+                       @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
+
+        if (result.hasErrors()) {
+            return "form";
         }
-        model.addAttribute("listEmployee", bookService.getBook());
-        return "list-books";
+
+        if (file != null && !file.isEmpty()) {
+            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            File dir = new File(uploadDir);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            File destination = new File(uploadDir + fileName);
+            file.transferTo(destination);
+            book.setCoverImage(fileName);
+        }
+        service.save(book);
+        return "redirect:/books";
     }
 
-    @GetMapping("/search-by-name")
-    public String searchByName(@RequestParam("title")String title, Model model){
-        if(title==null){
-            title = "";
+    @GetMapping("/edit/{id}")
+    public String edit(@PathVariable Long id, Model model) {
+        Book b = service.findById(id);
+        if (b == null) {
+            return "redirect:/books";
         }
-        model.addAttribute("listEmployee", bookService.searchByTitle(title));
-        return "list-books";
+        model.addAttribute("book", b);
+        return "form";
+    }
+
+    @GetMapping("/delete/{id}")
+    public String delete(@PathVariable Long id) {
+        service.delete(id);
+        return "redirect:/books";
     }
 }

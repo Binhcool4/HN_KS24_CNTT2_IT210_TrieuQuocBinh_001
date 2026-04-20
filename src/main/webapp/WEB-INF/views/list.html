@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Danh sách Sách</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f7f7f7;
+            color: #222;
+        }
+        .container {
+            max-width: 940px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+        .header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+        .abc{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+        .btn {
+            border: 1px solid #d4d4d4;
+            border-radius: 6px;
+            padding: 8px 12px;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-block;
+            background: #fff;
+            color: #222;
+        }
+        .btn:hover { background: #f3f4f6; }
+        .btn-primary { background: #2f6feb; border-color: #2f6feb; color: #fff; }
+        .btn-primary:hover { background: #255fcb; }
+        .btn-danger { color: #b91c1c; }
+        .btn-edit { color: #1f4dbf; }
+        .search-form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            width: 50%;
+        }
+        input[type="text"],
+        select {
+            min-height: 36px;
+            border: 1px solid #d4d4d4;
+            border-radius: 6px;
+            padding: 7px 10px;
+            font-size: 14px;
+        }
+        input[type="text"] { flex: 1 1 260px; }
+        .empty {
+            margin-top: 10px;
+            color: #555;
+            background: #fafafa;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            padding: 12px;
+        }
+        .table-wrap {
+
+        }
+        table {
+            margin-top: 10px;
+            width: 100%;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            min-width: 720px;
+            background-color: #fff;
+        }
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ececec;
+            text-align: left;
+            background-color: #fff;
+        }
+        th {
+            font-size: 14px;
+        }
+        .coverImage {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+        }
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div>
+        <div class="header">
+            <h1>Danh sách Sách</h1>
+        </div>
+        <div class="abc">
+            <form class="search-form" method="get">
+                <input type="text" name="keyword" placeholder="Tìm theo tên/tên tác giả"
+                       id="keyword"
+                       th:value="${param.keyword}"/>
+                <button class="btn btn-primary" type="submit">Tìm</button>
+            </form>
+            <a class="btn btn-primary" href="/books/add">+ Thêm mới</a>
+        </div>
+
+
+        <div class="empty" th:if="${#lists.isEmpty(list)}">
+            Hiện chưa có sách nào.
+        </div>
+
+        <div class="table-wrap" th:if="${!#lists.isEmpty(list)}">
+            <table>
+                <tr>
+
+                    <th>Tên</th>
+                    <th>Tác giả</th>
+                    <th>Số lượng</th>
+                    <th>Ảnh</th>
+                    <th>Hành động</th>
+                </tr>
+
+                <tr th:each="b : ${list}">
+                    <td th:text="${b.title}"></td>
+                    <td th:text="${b.author}"></td>
+                    <td th:text="${b.quantity}"></td>
+                    <td>
+                        <img class="coverImage" th:src="@{${b.coverImage != null ? '/uploads/' + b.coverImage : '/images/coverImage-default.png'}}"
+                             alt="coverImage"/>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <a class="btn btn-edit" th:href="@{'/books/edit/' + ${b.id}}">Sửa</a>
+                            <a class="btn btn-danger" th:href="@{'/books/delete/' + ${b.id}}"
+                               onclick="return confirm('Xóa không?')">Xóa</a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

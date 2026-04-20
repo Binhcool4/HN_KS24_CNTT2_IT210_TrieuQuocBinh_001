@@ -6,9 +6,14 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 public class WebInit extends AbstractAnnotationConfigDispatcherServletInitializer {
+     private static final String TMP_LOCATION = System.getProperty("java.io.tmpdir");
+         private static final long MAX_FILE_SIZE = 10 * 1024 * 1024L;
+         private static final long MAX_REQUEST_SIZE = 10 * 1024 * 1024L;
+         private static final int FILE_SIZE_THRESHOLD = 0;
+
     @Override
     protected Class<?> @Nullable [] getRootConfigClasses() {
-        return new Class[]{WebConfig.class, I18NConfiguration.class};
+        return new Class[]{WebConfig.class};
     }
 
     @Override
@@ -22,7 +27,7 @@ public class WebInit extends AbstractAnnotationConfigDispatcherServletInitialize
     }
 
     @Override
-    protected void customizeRegistration(ServletRegistration.Dynamic registration) {
-        registration.setMultipartConfig(new MultipartConfigElement("",10*1024*1024L,50*1024*1024L,0));
-    }
+         protected void customizeRegistration(ServletRegistration.Dynamic registration) {
+             registration.setMultipartConfig(new MultipartConfigElement(TMP_LOCATION, MAX_FILE_SIZE, MAX_REQUEST_SIZE, FILE_SIZE_THRESHOLD));
+         }
 }

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Form Sách</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f7f7f7;
+            color: #222;
+        }
+        .container {
+            max-width: 700px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #e5e5e5;
+        }
+        h2 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 16px;
+            font-size: 22px;
+        }
+        .field {
+            margin-bottom: 12px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="file"],
+        select {
+            width: 100%;
+            min-height: 36px;
+            border: 1px solid #d4d4d4;
+            border-radius: 6px;
+            padding: 7px 10px;
+            font-size: 14px;
+            background: #fff;
+        }
+        .error {
+            color: #b91c1c;
+            display: block;
+            margin-top: 5px;
+            font-size: 13px;
+        }
+        .actions {
+            margin-top: 16px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            border: 1px solid #d4d4d4;
+            border-radius: 6px;
+            padding: 8px 12px;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-block;
+            background: #fff;
+            color: #222;
+        }
+        .btn-primary {
+            background: #2f6feb;
+            border-color: #2f6feb;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #255fcb;
+        }
+        .btn-secondary {
+            background: #fff;
+            color: #222;
+        }
+        .btn-secondary:hover {
+            background: #f3f4f6;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <h2 th:text="${book != null && book.id != null ? 'Sửa Sách' : 'Thêm Sách'}"></h2>
+
+        <form th:action="@{/books/save}" method="post"
+              enctype="multipart/form-data"
+              th:object="${book}">
+
+            <input type="hidden" th:field="*{id}"/>
+
+            <div class="field">
+                <label for="title">Tên Sách</label>
+                <input id="title" type="text" th:field="*{title}"/>
+                <span class="error" th:errors="*{title}"></span>
+            </div>
+
+            <div class="field">
+                <label for="author">Tác giả</label>
+                <input id="author" type="text" th:field="*{author}"/>
+                <span class="error" th:errors="*{author}"></span>
+            </div>
+
+            <div class="field">
+                <label for="quantity">Số lượng</label>
+                <input id="quantity" type="number" step="1" min="0"
+                       th:field="*{quantity}"/>
+                <span class="error" th:errors="*{quantity}"></span>
+            </div>
+
+            <div class="field">
+                <label for="file">Ảnh</label>
+                <input id="file" type="file" name="file" accept=".jpg,.jpeg,.png"/>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" type="submit">Lưu</button>
+                <a class="btn btn-secondary" href="/books">Quay lại</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
